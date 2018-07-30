@@ -39,7 +39,7 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     console.error('x-hub-signature', signature, 'did not match', expectedSignature);
     return res.status(403).send('Your x-hub-signature\'s bad and you should feel bad!');
   }
-  return postToSlack(req.body.compare, req.body.commits.length, req.body.repository).then(() => {
+  return postToSlack(req.body.comment.body).then(() => {
     return res.end();
   }).catch((error) => {
     console.error(error);
@@ -47,10 +47,21 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   });
 });
 
+function postToSlack(body) {
+  return rp({
+    method: 'POST',
+    // TODO: Configure the `slack.webhook_url` Google Cloud environment variables.
+    uri: functions.config().slack.webhook_url,
+    body: {
+      text: `<${body}|new comment> pushed to <${repo.url}|${repo.full_name}>.`,
+    },
+    json: true,
+  });
+}
 /**
  * Post a message to Slack about the new GitHub commit.
  */
-function postToSlack(url, commits, repo) {
+function postToSlackBody(url, commits, repo) {
   return rp({
     method: 'POST',
     // TODO: Configure the `slack.webhook_url` Google Cloud environment variables.
