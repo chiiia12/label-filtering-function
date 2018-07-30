@@ -40,13 +40,14 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     return res.status(403).send('Your x-hub-signature\'s bad and you should feel bad!');
   }
 
-  var message;
+	let message = '';
+	console.log(`req header is ${req.header['x-github-event']}`)
   switch(req.header['x-github-event']){
 	  case 'issue_comment':
 	    const url = req.body.comment.html_url
             const body = req.body.comment.body
-            const username = req.body.comment.login
-	    message =  `${username} commented. ${body}\n ${url}`
+            const username = req.body.comment.user.login
+	    message += `${username} commented.\n>${body}\n ${url}`
 
           case 'issues':
   }
