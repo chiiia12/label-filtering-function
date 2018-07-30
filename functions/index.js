@@ -53,7 +53,7 @@ function postToSlack(body) {
     // TODO: Configure the `slack.webhook_url` Google Cloud environment variables.
     uri: functions.config().slack.webhook_url,
     body: {
-      text: `<${body}|new comment> pushed to <${repo.url}|${repo.full_name}>.`,
+      text: `<${body}|new comment> pushed to .`,
     },
     json: true,
   });
