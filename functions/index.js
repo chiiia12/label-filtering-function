@@ -58,17 +58,3 @@ function postToSlack(body) {
     json: true,
   });
 }
-/**
- * Post a message to Slack about the new GitHub commit.
- */
-function postToSlackBody(url, commits, repo) {
-  return rp({
-    method: 'POST',
-    // TODO: Configure the `slack.webhook_url` Google Cloud environment variables.
-    uri: functions.config().slack.webhook_url,
-    body: {
-      text: `<${url}|${commits} new commit${commits > 1 ? 's' : ''}> pushed to <${repo.url}|${repo.full_name}>.`,
-    },
-    json: true,
-  });
-}
