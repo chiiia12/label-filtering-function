@@ -39,7 +39,19 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     console.error('x-hub-signature', signature, 'did not match', expectedSignature);
     return res.status(403).send('Your x-hub-signature\'s bad and you should feel bad!');
   }
-  return postToSlack(req.body.comment.body).then(() => {
+
+  var message;
+  switch(req.header['x-github-event']){
+	  case 'issue_comment':
+	    const url = req.body.comment.html_url
+            const body = req.body.comment.body
+            const username = req.body.comment.login
+	    message =  `${username} commented. ${body}\n ${url}`
+
+          case 'issues':
+  }
+
+  return postToSlack(message).then(() => {
     return res.end();
   }).catch((error) => {
     console.error(error);
@@ -47,13 +59,13 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   });
 });
 
-function postToSlack(body) {
+function postToSlack(message) {
   return rp({
     method: 'POST',
     // TODO: Configure the `slack.webhook_url` Google Cloud environment variables.
     uri: functions.config().slack.webhook_url,
     body: {
-      text: `<${body}|new comment> pushed to .`,
+      text: `${message}`,
     },
     json: true,
   });
