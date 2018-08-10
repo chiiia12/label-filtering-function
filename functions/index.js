@@ -19,7 +19,7 @@ const functions = require('firebase-functions');
 const rp = require('request-promise');
 const crypto = require('crypto');
 const secureCompare = require('secure-compare');
-const configure = require('./config.json');
+const config = require('./config.json');
 
 /**
  * Webhook that will be called each time there is a new GitHub commit and will post a message to
@@ -31,7 +31,7 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
 
   // TODO: Configure the `github.secret` Google Cloud environment variables.
   const hmac = crypto.createHmac(cipher, functions.config().github.secret)
-    .update(JSON.stringify(req.body,null,0))
+    .update(JSON.stringify(req.body, null, 0))
     .digest('hex');
   const expectedSignature = `${cipher}=${hmac}`;
 
@@ -41,24 +41,28 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     return res.status(403).send('Your x-hub-signature\'s bad and you should feel bad!');
   }
 
-	let message = '';
+  let message = '';
   console.log(`req header is ${req.header['x-github-event']}`)
-  let array =req.body.issue.labels;
+  let array = req.body.issue.labels;
   console.log(array);
-  array.map(x=>x.name);
-	let filterArray =array.filter(x=>config.label.includes(x));
-	if(filterArray.length !== config.label.length){
-		return res.status(200).send('label don\'t match')
-	}
-   switch(req.header['x-github-event']){
-	   case 'issue_comment':
-	    const url = req.body.comment.html_url
-            const body = req.body.comment.body
-            const username = req.body.comment.user.login
-	    message += `${username} commented.\n>${body}\n ${url}`
-
-           case 'issues':
-   }
+  array = array.map(x => x.name);
+  let filterArray = array.filter(x => config.label.includes(x));
+  if (filterArray.length !== config.label.length) {
+    return res.status(200).send('label don\'t match')
+  }
+  // switch (req.header['x-github-event']) {
+  //   case 'issue_comment':
+  //   {
+      const url = req.body.comment.html_url
+      const body = req.body.comment.body
+      const username = req.body.comment.user.login
+      message += `${username} commented.\n>${body}\n ${url}`
+  //     break;
+  //   }
+  //   case 'issues':
+  //   break;
+  // }
+  console.log(message)
 
   return postToSlack(message).then(() => {
     return res.end();
