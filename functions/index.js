@@ -41,7 +41,7 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   }
 
 	let message = '';
-	console.log(`req header is ${req.header['x-github-event']}`)
+  console.log(`req header is ${req.header['x-github-event']}`)
   switch(req.header['x-github-event']){
 	  case 'issue_comment':
 	    const url = req.body.comment.html_url
