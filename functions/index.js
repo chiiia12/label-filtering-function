@@ -56,7 +56,7 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
       const url = req.body.issue.url
       const body = req.body.issue.body
       const username = req.body.issue.user.login
-      message += `${username} commented.\n>${body}\n ${url}`
+      message += `${username} opened issue.\n>${body}\n ${url}`
       break;
     }
     case 'created':
@@ -67,8 +67,6 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
       message += `${username} commented.\n>${body}\n ${url}`
       break;
     }
-    case 'issues':
-    break;
   }
   console.log(message)
 
