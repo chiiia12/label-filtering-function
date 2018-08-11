@@ -50,18 +50,18 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   if (filterArray.length !== config.label.length) {
     return res.status(200).send('label don\'t match')
   }
-  // switch (req.header['x-github-event']) {
-  //   case 'issue_comment':
-  //   {
+  switch (req.body.action){
+    case 'created':
+    {
       const url = req.body.comment.html_url
       const body = req.body.comment.body
       const username = req.body.comment.user.login
       message += `${username} commented.\n>${body}\n ${url}`
-  //     break;
-  //   }
-  //   case 'issues':
-  //   break;
-  // }
+      break;
+    }
+    case 'issues':
+    break;
+  }
   console.log(message)
 
   return postToSlack(message).then(() => {
