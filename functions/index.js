@@ -51,6 +51,14 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     return res.status(200).send('label don\'t match')
   }
   switch (req.body.action){
+    case 'opened':
+    {
+      const url = req.body.issue.url
+      const body = req.body.issue.body
+      const username = req.body.issue.user.login
+      message += `${username} commented.\n>${body}\n ${url}`
+      break;
+    }
     case 'created':
     {
       const url = req.body.comment.html_url
