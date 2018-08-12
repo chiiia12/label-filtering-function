@@ -50,25 +50,31 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   if (filterArray.length !== config.label.length) {
     return res.status(200).send('label don\'t match')
   }
-  switch (req.body.action){
+  switch (req.body.action) {
+    // opened issue
     case 'opened':
-    {
-      const url = req.body.issue.url
-      const body = req.body.issue.body
-      const username = req.body.issue.user.login
-      message += `${username} opened issue.\n>${body}\n ${url}`
-      break;
-    }
+      {
+        const url = req.body.issue.url
+        const title = req.body.issue.title
+        const body = req.body.issue.body
+        const username = req.body.issue.user.login
+        message += `${username} opened issue.\n>${title}\n>${body}\n ${url}`
+        break;
+      }
+    //add comment
     case 'created':
-    {
-      const url = req.body.comment.html_url
-      const body = req.body.comment.body
-      const username = req.body.comment.user.login
-      message += `${username} commented.\n>${body}\n ${url}`
-      break;
-    }
+      {
+        const url = req.body.comment.html_url
+        const title = req.body.issue.title
+        const comementbody = req.body.comment.body
+        const username = req.body.comment.user.login
+        message += `${username} commented to ${title}.\n>${commentbody}\n ${url}`
+        break;
+      }
   }
-  console.log(message)
+  if (message === "") {
+    return res.status(200).send("action don't match")
+  }
 
   return postToSlack(message).then(() => {
     return res.end();
