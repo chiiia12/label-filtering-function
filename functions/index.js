@@ -71,6 +71,16 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
         message += `${username} commented to ${title}.\n>${commentbody}\n ${url}`
         break;
       }
+    //close issue
+    case 'closed':
+     {
+        const url = req.body.issue.url
+        const title = req.body.issue.title
+        const body = req.body.issue.body
+        const username = req.body.issue.user.login
+        message += `${username} closed issue.\n>${title}\n>${body}\n ${url}`
+        break;
+     }
   }
   if (message === "") {
     return res.status(200).send("action don't match")
