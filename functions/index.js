@@ -58,7 +58,17 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
         const title = req.body.issue.title
         const body = req.body.issue.body
         const username = req.body.issue.user.login
-        message += `${username} opened issue.\n>${title}\n>${body}\n ${url}`
+        message += `${username} ${req.body.action} issue.\n>${title}\n>${body}\n ${url}`
+        break;
+      }
+    // edited issue
+    case 'edited':
+      {
+        const url = req.body.issue.url
+        const title = req.body.issue.title
+        const body = req.body.issue.body
+        const username = req.body.issue.user.login
+        message += `${username} ${req.body.action} issue.\n>${title}\n>${body}\n ${url}`
         break;
       }
     //add comment
@@ -79,6 +89,16 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
         const body = req.body.issue.body
         const username = req.body.issue.user.login
         message += `${username} closed issue.\n>${title}\n>${body}\n ${url}`
+        break;
+     }
+    //reopen issue
+    case 'reopen':
+     {
+        const url = req.body.issue.url
+        const title = req.body.issue.title
+        const body = req.body.issue.body
+        const username = req.body.issue.user.login
+        message += `${username} reopen issue.\n>${title}\n>${body}\n ${url}`
         break;
      }
   }
