@@ -41,7 +41,6 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
     return res.status(403).send('Your x-hub-signature\'s bad and you should feel bad!');
   }
 
-  let message = '';
   console.log(`req header is ${req.header['x-github-event']}`)
   let array = req.body.issue.labels;
   console.log(array);
@@ -50,57 +49,15 @@ exports.githubWebhook = functions.https.onRequest((req, res) => {
   if (filterArray.length !== config.label.length) {
     return res.status(200).send('label don\'t match')
   }
-  switch (req.body.action) {
-    // opened issue
-    case 'opened':
-      {
-        const url = req.body.issue.url
-        const title = req.body.issue.title
-        const body = req.body.issue.body
-        const username = req.body.issue.user.login
-        message += `${username} ${req.body.action} issue.\n>${title}\n>${body}\n ${url}`
-        break;
-      }
-    // edited issue
-    case 'edited':
-      {
-        const url = req.body.issue.url
-        const title = req.body.issue.title
-        const body = req.body.issue.body
-        const username = req.body.issue.user.login
-        message += `${username} ${req.body.action} issue.\n>${title}\n>${body}\n ${url}`
-        break;
-      }
-    //add comment
-    case 'created':
-      {
-        const url = req.body.comment.html_url
-        const title = req.body.issue.title
-        const comementbody = req.body.comment.body
-        const username = req.body.comment.user.login
-        message += `${username} commented to ${title}.\n>${commentbody}\n ${url}`
-        break;
-      }
-    //close issue
-    case 'closed':
-     {
-        const url = req.body.issue.url
-        const title = req.body.issue.title
-        const body = req.body.issue.body
-        const username = req.body.issue.user.login
-        message += `${username} closed issue.\n>${title}\n>${body}\n ${url}`
-        break;
-     }
-    //reopen issue
-    case 'reopen':
-     {
-        const url = req.body.issue.url
-        const title = req.body.issue.title
-        const body = req.body.issue.body
-        const username = req.body.issue.user.login
-        message += `${username} reopen issue.\n>${title}\n>${body}\n ${url}`
-        break;
-     }
+  const title = req.body.issue.title
+  const username = req.body.issue.user.login
+  const body = req.body.issue.body
+  const url = req.body.issue.url
+  let message = `${username} ${req.body.action} issue.\n>${title}\n>${body}\n ${url}`
+  if (req.body.action === 'created') {
+    const url = req.body.comment.html_url
+    const comementbody = req.body.comment.body
+    message = `${username} commented to ${title}.\n>${commentbody}\n ${url}`
   }
   if (message === "") {
     return res.status(200).send("action don't match")
